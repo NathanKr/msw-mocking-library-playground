@@ -5,10 +5,12 @@ import { url } from "../components/JsonPlaceholder";
 import { render } from "@testing-library/react";
 import JsonPlaceholder from "../components/JsonPlaceholder";
 
+const computeResponse = (req, res, ctx) => {
+  return res(ctx.status(200), ctx.json([{ name: "Jim" }]));
+}
+
 const server = setupServer(
-  rest.get(url, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json([{ name: "Jim" }]));
-  })
+  rest.get(url, computeResponse)
 );
 
 beforeAll(() => {
@@ -25,6 +27,5 @@ afterEach(() => {
 
 test("first and last names appears", async () => {
   const { findByText } = render(<JsonPlaceholder />);
-  const item = await findByText("Jim");
-  expect(item).not.toBeNull();
+  expect(await findByText("Jim")).toBeInTheDocument()
 });
